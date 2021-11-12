@@ -20,7 +20,7 @@ def pingthread(ip, file):
             try:
 
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.settimeout(0.6)
+                sock.settimeout(0.2)
                 rslt = sock.connect((str(ip), port))
 
                 if rslt == None:
