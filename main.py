@@ -13,23 +13,23 @@ def pingthread(ip, file):
     if ms != None:
         file.write(f"ip: {ip} -> {ms}\n")
 
-    else:
+    #else:
 
-        for port in [80, 442, 21, 22, 8080]: # quelques ports usuels, vous pouvez en ajouter
-            try:
+    for port in [80, 442, 21, 22, 8080]: # quelques ports usuels, vous pouvez en ajouter
+        try:
 
-                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.settimeout(0.05)
-                rslt = sock.connect((str(ip), port))
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(0.05)
+            rslt = sock.connect((str(ip), port))
 
-                if rslt == None:
-                    file.write(f"ip: {str(ip)} -> PORT: {str(port)} OUVERT\n")
-                    
-            except:
-                pass
+            if rslt == None:
+                file.write(f"ip: {str(ip)} -> PORT: {str(port)} OUVERT\n")
+                
+        except:
+            pass
 
-            finally:
-                sock.close()
+        finally:
+            sock.close()
 
 
 
@@ -103,11 +103,11 @@ def main():
     
     elif sys.argv[1] == "ping": 
 
-        start_time = int(time.time())
+        start_time = float(time.time())
 
         ping_all(sys.argv[2], sys.argv[3]) # ip_start and ip_end
 
-        end_time = int(time.time())
+        end_time = float(time.time())
 
         print("\n")
         read_data()
