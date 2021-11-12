@@ -1,6 +1,5 @@
 import time
 import sys
-import os
 import socket
 import threading
 import re
@@ -20,7 +19,7 @@ def pingthread(ip, file):
             try:
 
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.settimeout(0.2)
+                sock.settimeout(0.05)
                 rslt = sock.connect((str(ip), port))
 
                 if rslt == None:
