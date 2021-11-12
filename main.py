@@ -1,114 +1,80 @@
+import time
 import sys
 import os
 import threading
 import re
+import ipaddress
+from ping3 import ping
+
+def pingthread(ip, file):
+
+    ms = ping(f"{ip}", unit="ms", timeout=1)
+    file.write(f"ip: {ip} -> {ms}\n")
 
 
-def pingthread(ip, i):
-
-    os.system(f"ping -n 10 {ip[0]}.{ip[1]}.{ip[2]}.{i} > {i}_rslt.txt") # 0 = ok 1 = error
-
-    with open(f"{i}_rslt.txt", "r") as file:
-
-        text = file.read()
-        reg = re.search("\sImpossible\sde\sjoindre\s.*de\sdestination\.", text)
-
-        if reg == None:
-            print(f"PING REUSSI POUR {ip[0]}.{ip[1]}.{ip[2]}.{i} !")
+def ping_all(ip, ip_e):
     
+    os.remove("ip_list.txt")
+    file = open("ip_list.txt", "a")
 
-    os.remove(f"{i}_rslt.txt")
+    value = ipaddress.ip_address(ip)
+    ip_e = ipaddress.ip_address(ip_e)
+    threads = []
 
-"""
-def pingthread_enterprise(ip_s, computers):
+    while True:
 
-    print(computers)
-
-    for i in range(0, len(ip_s)):
-        if len(ip_s[i]) < 3: 
-            ip_s[i] = "0" * (3-len(ip_s[i])) + ip_s[i]
-
-    print(ip_s)
-
-    for i in range(0, computers):
-
-        ip = f"{ip_s[0] + ip_s[1] + ip_s[2] + ip_s[3]}"
-        ip = format(int(ip), "b") 
-        print(ip)
-
-
-
-
-def ping_enterprise(ip_s, ip_e):
-
-    ip_s = str(ip_s).split("/")[0].split(".")
-    ip_e = str(ip_e).split("/")[0].split(".")
-
-    hosts = []
-
-    for byte in range(0, 4):
-
-        hosts.append(int(ip_e[byte]) - int(ip_s[byte]))
-                
-
-    computers = (hosts[0] * 255*255*255) + (hosts[1] * 255*255) + (hosts[2] * 255) + hosts[3]
-    
-    pingthread_enterprise(ip_s, computers)
-
-"""
-
-
-def ping_all(ip):
-    
-    ip_range = int(str(ip).split(".")[3])
-    ip = str(ip).split(".")
-
-    ip_range = 256 - ip_range
-
-
-    for i in range(1, ip_range):
-        
-        thread = threading.Thread(target=pingthread, args=(ip, i))
+        thread = threading.Thread(target=pingthread, args=(value, file))
         thread.start()
+        threads.append(thread)
 
+        value+=1
 
+        if value >= ip_e:
+            break    
+
+    for i in range(0, len(threads)):
+
+        threads[i].join()
+        
+    file.close()
+
+def read_data():
+
+    file = open("ip_list.txt", "r")
+    data = file.read()
+
+    reg = re.findall("ip\:\s([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\s\-\>\s([0-9]+)\.[0-9]+", data)
+    
+
+    for ip in reg:
+        print(f"IP: {ip[0]} a répondu avec {ip[1]} millisecondes")
 
 
 def main():
-    
 
-    if len(sys.argv) < 3 : 
+    if len(sys.argv) < 4 : 
         print("""
         Commands: 
-        - scanICMPlocal (scan ICMP réseau local ipv4)
-        - scanICMPenterprise (scan des grosses ip avec un masque)
+        - ping
 
-        (dans le cas du réseau local)
-        ip_start sera par exemple : 
-        - 192.168.0.1
-        - 10.0.0.1
-        à noter que cette fonction va tester le delta d'ip entre 256 et le dernier bit donné à l'ip de départ
+        ./main.py <Command> <ip_start> [<ip_end>]
 
-        (dans le cas du réseau d'entreprise)
-        ip de début et ip de fin, exemple:
-        - 10.0.0.1 10.0.255.254
-
-        main.py <Command> <ip_start> [<ip_end>]
-
-        !!! (Le program va créer des fichier texts qu'il va ensuite supprimer) !!!
         """)
         return
 
     
-    elif sys.argv[1] == "scanICMPlocal": 
-        ip = sys.argv[2]
-        ping_all(ip)
-"""
-    elif sys.argv[1] == "scanICMPenterprise" and len(sys.argv) == 4: 
-        ip_s = sys.argv[2]
-        ip_e = sys.argv[3]
-        ping_enterprise(ip_s, ip_e)
-"""
+    elif sys.argv[1] == "ping": 
+
+        start_time = int(time.time())
+
+        ping_all(sys.argv[2], sys.argv[3]) # ip_start and ip_end
+
+        end_time = int(time.time())
+
+        print("\n")
+        read_data()
+
+        print(f"\n\nTemps écoulé : {end_time - start_time} secondes.\n")
 
 
 
