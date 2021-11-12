@@ -1,6 +1,7 @@
 import time
 import sys
 import os
+import socket
 import threading
 import re
 import ipaddress
@@ -9,13 +10,38 @@ from ping3 import ping
 def pingthread(ip, file):
 
     ms = ping(f"{ip}", unit="ms", timeout=1)
-    file.write(f"ip: {ip} -> {ms}\n")
+
+    if ms != None:
+        file.write(f"ip: {ip} -> {ms}\n")
+
+    else:
+
+        for port in [80, 442, 21, 22, 8080]: # quelques ports usuels, vous pouvez en ajouter
+            try:
+
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.settimeout(0.6)
+                rslt = sock.connect((str(ip), port))
+
+                if rslt == None:
+                    file.write(f"ip: {str(ip)} -> PORT: {str(port)} OUVERT\n")
+                    
+            except:
+                pass
+
+            finally:
+                sock.close()
+
+
+
+
 
 
 def ping_all(ip, ip_e):
-    
-    os.remove("ip_list.txt")
-    file = open("ip_list.txt", "a")
+
+    open("ip_list.txt", "w").close()
+
+    file = open("ip_list.txt", "a", encoding="utf-8")
 
     value = ipaddress.ip_address(ip)
     ip_e = ipaddress.ip_address(ip_e)
@@ -38,16 +64,29 @@ def ping_all(ip, ip_e):
         
     file.close()
 
+
+
+
+
+
 def read_data():
 
-    file = open("ip_list.txt", "r")
+    file = open("ip_list.txt", "r", encoding="utf-8")
     data = file.read()
 
+    # check si ping success
     reg = re.findall("ip\:\s([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\s\-\>\s([0-9]+)\.[0-9]+", data)
-    
-
     for ip in reg:
         print(f"IP: {ip[0]} a répondu avec {ip[1]} millisecondes")
+
+    # check si ports success
+    reg = re.findall("ip\:\s([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\s\-\>\sPORT:\s([0-9]+)\sOUVERT", data)
+    for d in reg:
+        print(f"IP: {d[0]} a répondu avec le port: {d[1]}")
+
+
+
+
 
 
 def main():
