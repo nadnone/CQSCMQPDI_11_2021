@@ -15,15 +15,16 @@ def pingthread(ip, file):
 
     else:
 
-        for port in [80, 442, 21, 22, 8080]: # quelques ports usuels, vous pouvez en ajouter
+        for port in [80, 443, 21, 43, 22, 25, 587, 465, 143, 8080]: # quelques ports usuels, vous pouvez en ajouter
             try:
 
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.settimeout(0.05)
+                sock.settimeout(0.04)
                 rslt = sock.connect((str(ip), port))
 
                 if rslt == None:
                     file.write(f"ip: {str(ip)} -> PORT: {str(port)} OUVERT\n")
+                    break
                     
             except:
                 pass
