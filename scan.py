@@ -32,7 +32,7 @@ class Scanner:
         threads = []
         
 
-        for port in range(1, 65535): # quelques ports usuels, vous pouvez en ajouter
+        for port in range(1, 65535):
             thread = threading.Thread(target=Scanner.port_check_thread, args=(file, ip, port))
             thread.start()
             threads.append(thread)

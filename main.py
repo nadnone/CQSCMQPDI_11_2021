@@ -2,19 +2,15 @@ import time
 import sys
 
 
-from scan import Scanner
-from ping import Pings
-
+from Scan import Scanner
+from Ping import Pings
 
 
 def main():
 
-    
+    start_time = float(time.time())
 
-    
     if sys.argv[1] == "ping": 
-
-        start_time = float(time.time())
 
         Pings.ping_all(sys.argv[2], sys.argv[3]) # ip_start and ip_end
 
@@ -28,9 +24,7 @@ def main():
 
     elif sys.argv[1] == "scan":
 
-        start_time = float(time.time())
-
-        Scanner.scan_ports(sys.argv[2]) # ip_start and ip_end
+        Scanner.scan_ports(sys.argv[2])
 
         end_time = float(time.time())
 
