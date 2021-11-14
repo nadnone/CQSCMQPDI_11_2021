@@ -1,2 +1,4 @@
 
 ip_list.txt
+ports_scan_rslt.txt
+*.pyc
