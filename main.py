@@ -2,8 +2,8 @@ import time
 import sys
 
 
-from Scan import Scanner
-from Ping import Pings
+from scan import Scanner
+from ping import Pings
 
 
 def main():
